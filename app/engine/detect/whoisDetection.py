@@ -1,5 +1,6 @@
 import whois
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 
 @dataclass
 class DomainInfoModel:
@@ -46,15 +47,29 @@ class DomainInfo:
             state=domain_info.state,
             country=domain_info.country
         )
+    
+    def is_created_within_years(self, years):
+        creation_date = self.info.creation_date
+        if not isinstance(creation_date, list):
+            creation_date = [creation_date]
 
-if __name__ == "__main__":
-    # Domain adını belirtin
-    domain_name = "berenkudaygorun.com"
+        years_ago = datetime.now() - timedelta(days=365 * years)
+        if creation_date[0] >= years_ago:
+            return True
 
-    # Domain bilgilerini alın
-    domain_info = DomainInfo(domain_name).to_domain_info_model()
-    # Alınan bilgileri görüntüleyin
-    print("Domain Bilgileri:")
-    print(domain_info.domain_name)
-    print(domain_info.creation_date)
-    # Diğer özelliklere de erişebilirsiniz
+        return False
+
+    def is_created_within_1_year(self):
+        return self.is_created_within_years(1)
+
+    def is_created_within_2_years(self):
+        return self.is_created_within_years(2)
+
+    def is_created_within_3_years(self):
+        return self.is_created_within_years(3)
+
+    def is_created_within_4_years(self):
+        return self.is_created_within_years(4)
+
+    def is_created_within_5_years(self):
+        return self.is_created_within_years(5)

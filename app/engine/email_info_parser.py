@@ -2,20 +2,10 @@ import imaplib
 import email
 import quopri
 import re
+import sys
+sys.path.append('./app/engine/')
 import email_info as ei
-import os
-
-env_path = os.path.join(os.path.dirname(__file__), "../.env")
-
-
-with open(env_path) as f:
-    env = dict(line.split("=") for line in f)
-
-
-IMAP_SERVER = env['IMAP_SERVER']
-IMAP_SERVER = IMAP_SERVER[:len(IMAP_SERVER)-1]
-IMAP_USER = env['IMAP_USER']
-IMAP_PASSWORD = env['IMAP_PASSWORD']
+import detect.whoisDetection as whois
 
 def extract_target_addr(from_header):
     # "From" başlığını işleyen metot
@@ -59,7 +49,7 @@ def extract_attacker(forwarded_email_body):
     return re.findall(r'<(.*)>', forwarded_email_body)[0]
 
 
-def fetch_emails_from_sender(sender_email):
+def fetch_emails_from_sender(sender_email, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD):
     # E-postaları çeken metot
     mail = imaplib.IMAP4_SSL(IMAP_SERVER)
     mail.login(IMAP_USER, IMAP_PASSWORD)
@@ -102,11 +92,19 @@ def fetch_emails_from_sender(sender_email):
     mail.logout()
     return latest_emails
 
+
+# E-posta bilgilerini al
+IMAP_SERVER = ""
+IMAP_USER = ""
+IMAP_PASSWORD = ""
+
+SPECIFIC_SENDERS = ""
+
+
 def main():
-    specific_senders = ["pentesterpentester14@gmail.com"]
     latest_specific_emails = []
-    for sender in specific_senders:
-        latest_emails = fetch_emails_from_sender(sender)
+    for sender in SPECIFIC_SENDERS:
+        latest_emails = fetch_emails_from_sender(sender, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD)
         latest_specific_emails.extend(latest_emails)
 
     for email_info in latest_specific_emails:
@@ -120,6 +118,12 @@ def main():
         print('Başlık:', email_info.subject)
         print('İçerik:')
         print(email_info.body)
+        wh = whois.DomainInfo(email_info.attacker_domain)
+        print("1 sene önce mi alınmış: ", wh.is_created_within_1_year())
+        print("2 sene önce mi alınmış: ", wh.is_created_within_2_years())
+        print("3 sene önce mi alınmış: ", wh.is_created_within_3_years())
+        print("4 sene önce mi alınmış: ", wh.is_created_within_4_years())
+        print("5 sene önce mi alınmış: ", wh.is_created_within_5_years())
         print()
 
 if __name__ == "__main__":
