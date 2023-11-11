@@ -1,3 +1,7 @@
+import whois
+from bs4 import BeautifulSoup
+import requests
+
 class EmailInfo:
     def __init__(self, target_addr, target_name, target_domain, date, decoded_subject, email_body, is_forwarded, attacker_email, attacker_name, attacker_domain):
         self.target_addr = target_addr
@@ -10,34 +14,28 @@ class EmailInfo:
         self.attacker_email = attacker_email
         self.attacker_domain = attacker_domain
         self.attacker_name = attacker_name
-        
+        self.sender_domain_info = None
+        self.urls_info = []
+        self.blacklist_info = []
 
-    def get_target_address(self):
-        return self.target_addr
+    def set_sender_domain_info(self, sender_domain_info):
+        self.sender_domain_info = sender_domain_info
 
-    def get_target_name(self):
-        return self.target_name
+    def get_sender_domain_info(self):
+        return self.sender_domain_info
 
-    def get_target_domain(self):
-        return self.target_domain
+    def set_urls_info(self, urls_info):
+        self.urls_info = urls_info
 
-    def get_date(self):
-        return self.date
+    def get_urls_info(self):
+        return self.urls_info
 
-    def get_subject(self):
-        return self.subject
+    def set_blacklist_info(self, blacklist_info):
+        self.blacklist_info = blacklist_info
 
-    def get_body(self):
-        return self.body
+    def get_blacklist_info(self):
+        return self.blacklist_info
 
-    def is_email_forwarded(self):
-        return self.is_forwarded
 
-    def get_attacker_email(self):
-        return self.attacker_email
 
-    def get_attacker_domain(self):
-        return self.attacker_domain
 
-    def get_attacker_name(self):
-        return self.attacker_name
