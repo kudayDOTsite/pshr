@@ -1,6 +1,6 @@
 import whois
-from dataclasses import dataclass
 from datetime import datetime, timedelta
+from dataclasses import dataclass, field
 
 @dataclass
 class DomainInfoModel:
@@ -17,6 +17,12 @@ class DomainInfoModel:
     org: str
     state: str
     country: str
+    is_created_within_1_year: bool = field(default=False)
+    is_created_within_2_years: bool = field(default=False)
+    is_created_within_3_years: bool = field(default=False)
+    is_created_within_4_years: bool = field(default=False)
+    is_created_within_5_years: bool = field(default=False)
+
 
 class DomainInfo:
     def __init__(self, domain_name):
@@ -45,7 +51,13 @@ class DomainInfo:
             dnssec=domain_info.dnssec,
             org=domain_info.org,
             state=domain_info.state,
-            country=domain_info.country
+            country=domain_info.country,
+            is_created_within_1_year=self.is_created_within_1_year(),
+            is_created_within_2_years=self.is_created_within_2_years(),
+            is_created_within_3_years=self.is_created_within_3_years(),
+            is_created_within_4_years=self.is_created_within_4_years(),
+            is_created_within_5_years=self.is_created_within_5_years()
+
         )
     
     def is_created_within_years(self, years):

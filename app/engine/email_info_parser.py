@@ -7,6 +7,7 @@ sys.path.append('./app/engine/')
 import email_info as ei
 import detect.whoisDetection as whois
 import detect.linkDetection as linkDetection
+import detect.black_list_detection as blackListDetection
 
 def extract_target_addr(from_header):
     # "From" başlığını işleyen metot
@@ -107,41 +108,24 @@ def main():
     for sender in SPECIFIC_SENDERS:
         latest_emails = fetch_emails_from_sender(sender, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD)
         latest_specific_emails.extend(latest_emails)
-
     
     for email_info in latest_specific_emails:
-        print('Saldırgan:', email_info.attacker_email)
-        print('Saldırgan Adı:', email_info.attacker_name)
-        print('Saldırgan Domaini:', email_info.attacker_domain)
-        print('Hedef:', email_info.target_addr)
-        print('Hedef Adı:', email_info.target_name)
-        print('Hedef Domaini:', email_info.target_domain)
-        print('Tarih:', email_info.date)
-        print('Başlık:', email_info.subject)
-        print('İçerik:')
-        print(email_info.body)
         model = ei.EmailInfo(email_info.target_name, email_info.target_name, email_info.target_domain, email_info.date, email_info.subject, email_info.body, is_email_forwarded(email_info.body), email_info.attacker_email, email_info.attacker_name,email_info.attacker_domain)
-        print()
 
         wh = whois.DomainInfo(email_info.attacker_domain)
-        model.set_sender_domain_info(wh.get_domain_info())
-        print("1 sene önce mi alınmış: ", wh.is_created_within_1_year())
-        print("2 sene önce mi alınmış: ", wh.is_created_within_2_years())
-        print("3 sene önce mi alınmış: ", wh.is_created_within_3_years())
-        print("4 sene önce mi alınmış: ", wh.is_created_within_4_years())
-        print("5 sene önce mi alınmış: ", wh.is_created_within_5_years())
-        print()
+        model.set_sender_domain_info(wh.to_domain_info_model())
 
         ld = linkDetection.DomainCounter()
         ld.set_text(email_info.body)
-        print(ld.http_domains)
-        print(ld.https_domains)
-        print()
-        print(model.sender_domain_info)
+        model.set_http_urls_info(ld.http_domains)
+        model.set_https_urls_info(ld.https_domains)
 
-        
+        httpBlackListDetection = blackListDetection.DomainChecker(model.get_http_blacklist_info())
+        model.set_http_blacklist_info(httpBlackListDetection.get_results())
+        httpsBlackListDetection = blackListDetection.DomainChecker(model.get_https_blacklist_info())
+        model.set_https_blacklist_info(httpsBlackListDetection.get_results())
 
-
+    
 
 if __name__ == "__main__":
     main()

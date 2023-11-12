@@ -60,6 +60,8 @@ class DomainChecker:
             }
         }
 
+        self.check_domains()
+
     def check_domains(self):
         for domain in self.domain_list:
             url = f"https://www.usom.gov.tr/api/address/index?url={domain}"

@@ -14,9 +14,11 @@ class EmailInfo:
         self.attacker_email = attacker_email
         self.attacker_domain = attacker_domain
         self.attacker_name = attacker_name
-        self.sender_domain_info = None
-        self.urls_info = []
-        self.blacklist_info = []
+        self.sender_domain_info = []
+        self.http_urls_info = []
+        self.https_urls_info = []
+        self.http_blacklist_info = []
+        self.https_blacklist_info = []
 
     def set_sender_domain_info(self, sender_domain_info):
         self.sender_domain_info = sender_domain_info
@@ -24,17 +26,29 @@ class EmailInfo:
     def get_sender_domain_info(self):
         return self.sender_domain_info
 
-    def set_urls_info(self, urls_info):
-        self.urls_info = urls_info
+    def set_http_urls_info(self, http_urls_info):
+        self.http_urls_info = http_urls_info
 
-    def get_urls_info(self):
-        return self.urls_info
+    def set_https_urls_info(self, https_urls_info):
+        self.https_urls_info = https_urls_info
 
-    def set_blacklist_info(self, blacklist_info):
-        self.blacklist_info = blacklist_info
+    def get_http_urls_info(self):
+        return self.http_urls_info
+    
+    def get_https_urls_info(self):
+        return self.https_urls_info
 
-    def get_blacklist_info(self):
-        return self.blacklist_info
+    def set_http_blacklist_info(self, http_blacklist_info):
+        self.http_blacklist_info = http_blacklist_info
+
+    def get_http_blacklist_info(self):
+        return self.http_blacklist_info
+    
+    def set_https_blacklist_info(self, https_blacklist_info):
+        self.https_blacklist_info = https_blacklist_info
+
+    def get_https_blacklist_info(self):
+        return self.https_blacklist_info
 
 
 
