@@ -8,6 +8,7 @@ import email_info as ei
 import detect.whoisDetection as whois
 import detect.linkDetection as linkDetection
 import detect.black_list_detection as blackListDetection
+import email_analysis as ea
 
 def extract_target_addr(from_header):
     # "From" başlığını işleyen metot
@@ -95,16 +96,17 @@ def fetch_emails_from_sender(sender_email, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD
     return latest_emails
 
 
+
 # E-posta bilgilerini al
 IMAP_SERVER = ""
 IMAP_USER = ""
 IMAP_PASSWORD = ""
-
+OPENAI_KEY = ""
 SPECIFIC_SENDERS = ""
-
 
 def main():
     latest_specific_emails = []
+    email_analyzer = ea.EmailAnalysis(OPENAI_KEY)
     for sender in SPECIFIC_SENDERS:
         latest_emails = fetch_emails_from_sender(sender, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD)
         latest_specific_emails.extend(latest_emails)
@@ -126,7 +128,11 @@ def main():
         model.set_https_blacklist_info(httpsBlackListDetection.get_results())
 
         model.update_email_content_urls_whois_info()
-        print(model.create_summary())
+        
+        analysis_result = email_analyzer.analyze_email(model.create_summary())
+        print(analysis_result)
 
 if __name__ == "__main__":
     main()
+
+
