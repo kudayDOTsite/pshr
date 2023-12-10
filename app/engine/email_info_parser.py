@@ -120,12 +120,13 @@ def main():
         model.set_http_urls_info(ld.http_domains)
         model.set_https_urls_info(ld.https_domains)
 
-        httpBlackListDetection = blackListDetection.DomainChecker(model.get_http_blacklist_info())
+        httpBlackListDetection = blackListDetection.DomainChecker(ld.http_domains)
         model.set_http_blacklist_info(httpBlackListDetection.get_results())
-        httpsBlackListDetection = blackListDetection.DomainChecker(model.get_https_blacklist_info())
+        httpsBlackListDetection = blackListDetection.DomainChecker(ld.https_domains)
         model.set_https_blacklist_info(httpsBlackListDetection.get_results())
 
-    
+        model.update_email_content_urls_whois_info()
+        print(model.create_summary())
 
 if __name__ == "__main__":
     main()

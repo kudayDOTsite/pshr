@@ -62,12 +62,17 @@ class DomainInfo:
     
     def is_created_within_years(self, years):
         creation_date = self.info.creation_date
+        if creation_date is None:
+            # Eğer creation_date bilgisi yoksa, varsayılan bir değer döndür
+            return None
+
         if not isinstance(creation_date, list):
             creation_date = [creation_date]
 
         years_ago = datetime.now() - timedelta(days=365 * years)
-        if creation_date[0] >= years_ago:
-            return True
+        for date in creation_date:
+            if date is not None and date >= years_ago:
+                return True
 
         return False
 
