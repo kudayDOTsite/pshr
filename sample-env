@@ -1,0 +1,9 @@
+#change file name .env
+[Mail Information]
+IMAP_SERVER=imap.gmail.com
+IMAP_USER=your mail adress
+IMAP_PASSWORD=your mail adress password
+SPECIFIC_SENDERS=["email1"]
+
+[OPENAI]
+OPENAI_KEY=sk-key

@@ -9,6 +9,7 @@ import detect.whoisDetection as whois
 import detect.linkDetection as linkDetection
 import detect.black_list_detection as blackListDetection
 import email_analysis as ea
+import email_sender
 
 def extract_target_addr(from_header):
     # "From" başlığını işleyen metot
@@ -79,7 +80,7 @@ def fetch_emails_from_sender(sender_email, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD
         email_body = ""
         for part in msg.walk():
             if part.get_content_type() == "text/plain":
-                payload = part.get_payload(decode=True).decode('utf-8')
+                payload = part.get_payload(decode=True).decode('utf-8', errors='ignore')
                 email_body = extract_email_body(payload)
 
         is_forwarded = email_body.startswith("---------- Forwarded message ---------")
@@ -107,12 +108,12 @@ SPECIFIC_SENDERS = ""
 def main():
     latest_specific_emails = []
     email_analyzer = ea.EmailAnalysis(OPENAI_KEY)
-    for sender in SPECIFIC_SENDERS:
+    for sender in [SPECIFIC_SENDERS]:
         latest_emails = fetch_emails_from_sender(sender, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD)
         latest_specific_emails.extend(latest_emails)
     
     for email_info in latest_specific_emails:
-        model = ei.EmailInfo(email_info.target_name, email_info.target_name, email_info.target_domain, email_info.date, email_info.subject, email_info.body, is_email_forwarded(email_info.body), email_info.attacker_email, email_info.attacker_name,email_info.attacker_domain)
+        model = ei.EmailInfo(email_info.target_addr, email_info.target_name, email_info.target_domain, email_info.date, email_info.subject, email_info.body, is_email_forwarded(email_info.body), email_info.attacker_email, email_info.attacker_name,email_info.attacker_domain)
 
         wh = whois.DomainInfo(email_info.attacker_domain)
         model.set_sender_domain_info(wh.to_domain_info_model())
@@ -131,6 +132,14 @@ def main():
         
         analysis_result = email_analyzer.analyze_email(model.create_summary())
         print(analysis_result)
+
+        emailSender = email_sender.EmailSender(IMAP_USER, IMAP_PASSWORD)
+    
+        subject = "E-posta Analizi Sonucu [" + email_info.subject + "]"
+        body = analysis_result  # analysis_result değişkenini kullanarak sonucu e-posta içeriği olarak ekleyin
+        recipient_email = email_info.target_addr  # E-postayı alacak kişinin e-posta adresini belirtin
+
+        emailSender.send_email(subject, body, recipient_email)
 
 if __name__ == "__main__":
     main()
