@@ -9,7 +9,11 @@ class EmailAnalysis:
         messages = [
             {
                 "role": "system",
-                "content": "Sana verilen içerikte bir mail ile ilgili çeşitli bilgiler var. Bu mailin bir mail'in potansiye oltalama saldırısı olup olmadığını analiz etmeni isteyeceğim. Günün sonunda analizlerini gerçekleştir ve bana mail'in bir oltalama olup olmadığı hakkında yorum yap."
+                "content": "Sana verilen içerikte bir mail ile ilgili çeşitli bilgiler var." + 
+                " Bu mailin bir mail'in potansiye oltalama saldırısı olup olmadığını analiz etmeni isteyeceğim. " + 
+                "Ancak çok katı bir şekilde karalar almanı istemiyorum. Genelde kullanıcıdan kişisel verilerini isteyen, banka bilgilerini isteyen, tehditkar bir şekilde onları yönlendiren, onlara şaşırtıcı düeyde cazip fırsatlar sunan maillerin oltalama saldırısı olma ihtimali daha yüksektir." +
+                "Günün sonunda analizlerini gerçekleştir ve bana mail'in bir oltalama olup olmadığı hakkında yorum yap." +
+                " Ayrıca analizlerinin sonuna şu metni kesinlikle ekle: Bu sonuçlar GPT teknolojisi ile yapılmıştır, kullandığınız yazılım ticari bir ürün olmayıp Koç Üniversitesi Siber Güvenlik Bölümü Yüksek Lisans Dönem ödevidir."
             },
             {
                 "role": "user",

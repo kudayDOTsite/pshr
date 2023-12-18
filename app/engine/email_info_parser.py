@@ -29,7 +29,7 @@ def extract_decoded_subject(subject_header):
 def extract_email_body(payload):
     # E-posta içeriğini işleyen metot
     forwarded_message = payload.split('---------- Forwarded message ---------')[1] if '---------- Forwarded message ---------' in payload else None
-    return forwarded_message.strip() if forwarded_message else "E-posta içeriği çözümlenemedi."
+    return forwarded_message.strip() if forwarded_message else payload
 
 def extract_target_name(from_header):
     # Hedefin adını çıkaran metot
@@ -75,16 +75,25 @@ def fetch_emails_from_sender(sender_email, IMAP_SERVER, IMAP_USER, IMAP_PASSWORD
         target_domain = extract_domain(target_addr)
         date = extract_date(msg['date'])
 
+       
         decoded_subject = extract_decoded_subject(msg['subject'])
 
         email_body = ""
         for part in msg.walk():
             if part.get_content_type() == "text/plain":
-                payload = part.get_payload(decode=True).decode('utf-8', errors='ignore')
+                try:
+                    payload = part.get_payload(decode=True).decode('utf-8')
+                except UnicodeDecodeError:
+                    try:
+                        # Farklı bir kodlama deneyin
+                        payload = part.get_payload(decode=True).decode('iso-8859-1')
+                    except UnicodeDecodeError:
+                        # Hataları yoksayarak devam edin
+                        payload = part.get_payload(decode=True).decode('utf-8', errors='ignore')
                 email_body = extract_email_body(payload)
 
-        is_forwarded = email_body.startswith("---------- Forwarded message ---------")
 
+        is_forwarded = email_body.startswith("---------- Forwarded message ---------")
         attacker_email = extract_attacker(email_body)
         attacker_name = extract_target_name(email_body)
         attacker_domain = extract_domain(attacker_email)
