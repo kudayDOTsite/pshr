@@ -33,34 +33,46 @@ class DomainInfo:
         try:
             domain_info = whois.whois(self.domain_name)
             return domain_info
-        except whois.parser.PywhoisError as e:
-            return str(e)
+        except whois.parser.PywhoisError:
+            # Hata durumunda None dön
+            return None
+        
+        
+    def try_get_attr(self, obj, attr):
+        try:
+            return getattr(obj, attr)
+        except Exception:
+            return None
 
     def to_domain_info_model(self):
         domain_info = self.info
         return DomainInfoModel(
             domain_name=self.domain_name,
-            registrar=domain_info.registrar,
-            whois_server=domain_info.whois_server,
-            updated_date=domain_info.updated_date,
-            creation_date=domain_info.creation_date,
-            expiration_date=domain_info.expiration_date,
-            name_servers=domain_info.name_servers,
-            status=domain_info.status,
-            emails=domain_info.emails,
-            dnssec=domain_info.dnssec,
-            org=domain_info.org,
-            state=domain_info.state,
-            country=domain_info.country,
+            registrar=self.try_get_attr(domain_info, 'registrar'),
+            whois_server=self.try_get_attr(domain_info, 'whois_server'),
+            updated_date=self.try_get_attr(domain_info, 'updated_date'),
+            creation_date=self.try_get_attr(domain_info, 'creation_date'),
+            expiration_date=self.try_get_attr(domain_info, 'expiration_date'),
+            name_servers=self.try_get_attr(domain_info, 'name_servers'),
+            status=self.try_get_attr(domain_info, 'status'),
+            emails=self.try_get_attr(domain_info, 'emails'),
+            dnssec=self.try_get_attr(domain_info, 'dnssec'),
+            org=self.try_get_attr(domain_info, 'org'),
+            state=self.try_get_attr(domain_info, 'state'),
+            country=self.try_get_attr(domain_info, 'country'),
             is_created_within_1_year=self.is_created_within_1_year(),
             is_created_within_2_years=self.is_created_within_2_years(),
             is_created_within_3_years=self.is_created_within_3_years(),
             is_created_within_4_years=self.is_created_within_4_years(),
             is_created_within_5_years=self.is_created_within_5_years()
-
         )
+
     
     def is_created_within_years(self, years):
+        if self.info is None:
+            # Eğer domain bilgisi alınamadıysa, False döndür
+            return None
+        
         creation_date = self.info.creation_date
         if creation_date is None:
             # Eğer creation_date bilgisi yoksa, varsayılan bir değer döndür
