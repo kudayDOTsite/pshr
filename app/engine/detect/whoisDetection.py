@@ -1,5 +1,6 @@
 import whois
 from datetime import datetime, timedelta
+from dateutil import parser
 from dataclasses import dataclass, field
 
 @dataclass
@@ -29,6 +30,14 @@ class DomainInfo:
         self.domain_name = domain_name
         self.info = self.get_domain_info()
 
+    def to_datetime(self, date_obj):
+        if isinstance(date_obj, datetime):
+            return date_obj
+        try:
+            return parser.parse(str(date_obj))
+        except (ValueError, TypeError):
+            return None
+    
     def get_domain_info(self):
         try:
             domain_info = whois.whois(self.domain_name)
@@ -70,20 +79,19 @@ class DomainInfo:
     
     def is_created_within_years(self, years):
         if self.info is None:
-            # Eğer domain bilgisi alınamadıysa, False döndür
-            return None
-        
-        creation_date = self.info.creation_date
-        if creation_date is None:
-            # Eğer creation_date bilgisi yoksa, varsayılan bir değer döndür
-            return None
+            return False
 
-        if not isinstance(creation_date, list):
-            creation_date = [creation_date]
+        creation_dates = self.info.creation_date
+        if creation_dates is None:
+            return False
+
+        if not isinstance(creation_dates, list):
+            creation_dates = [creation_dates]
 
         years_ago = datetime.now() - timedelta(days=365 * years)
-        for date in creation_date:
-            if date is not None and date >= years_ago:
+        for date in creation_dates:
+            date = self.to_datetime(date)
+            if date and date >= years_ago:
                 return True
 
         return False
