@@ -65,25 +65,35 @@ class DomainChecker:
     def check_domains(self):
         for domain in self.domain_list:
             url = f"https://www.usom.gov.tr/api/address/index?url={domain}"
-            response = requests.get(url)
+            try:
+                response = requests.get(url, timeout=15)
 
-            if response.status_code == 200:
-                data = response.json()
-                if "models" in data:
-                    for item in data["models"]:
-                        if item["url"] in self.domain_list:
-                            result = {
-                                "id": item["id"],
-                                "url": item["url"],
-                                "type": item["type"],
-                                "source": self.sources.get(item["source"], {}),
-                                "date": item["date"],
-                                "connectiontype": self.connection_types.get(item["connectiontype"], {}),
-                            }
-                            # Kategoriye göre açıklama eklemek
-                            if result["type"] in self.categories:
-                                result["desc"] = self.categories[result["type"]]
-                            self.results.append(result)
+                if response.status_code == 200:
+                    data = response.json()
+                    if "models" in data:
+                        for item in data["models"]:
+                            if item["url"] in self.domain_list:
+                                result = {
+                                    "id": item["id"],
+                                    "url": item["url"],
+                                    "type": item["type"],
+                                    "source": self.sources.get(item["source"], {}),
+                                    "date": item["date"],
+                                    "connectiontype": self.connection_types.get(item["connectiontype"], {}),
+                                }
+                                # Kategoriye göre açıklama eklemek
+                                if result["type"] in self.categories:
+                                    result["desc"] = self.categories[result["type"]]
+                                self.results.append(result)
+                else:
+                    print(f"Hata: {response.status_code} durum kodu alındı.")
+
+            except requests.exceptions.Timeout:
+                print("Zaman aşımı hatası: Sunucu isteğe zamanında yanıt vermedi.")
+                return None  # Zaman aşımı durumunda None dön
+            except requests.exceptions.RequestException as e:
+                print(f"HTTP isteği sırasında hata oluştu: {e}")
+                return None  # Diğer hatalarda None dön
 
     def get_results(self):
         total_count = len(self.results)
