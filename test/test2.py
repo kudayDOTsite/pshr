@@ -52,7 +52,7 @@ def main(csv_file_path):
 if __name__ == '__main__':
     csv_file_path = 'datas/Nigerian_Fraud.csv'  # CSV dosyasının yolu
     emails = main(csv_file_path)
-    print(emails[228]["sender"])
+    print(len(emails))
     
 
 

@@ -115,7 +115,7 @@ def run(emails):
             "subject": email_data['subject'],
             "body": email_data['body'],
             "analysis_result": analysis_result,
-            "phishing_probability": "1" if "Oltalama Mail Olma İhtimali: 1" in analysis_result else "0"
+            "phishing_probability": "1" if ": 1" in analysis_result else "0"
         }
 
         # Sözlüğü sonuç listesine ekle
